@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "postgres-mcp": {
+      "command": "node",
+      "args": ["/Users/neetesh.vishwakarma/Documents/postgres-mcp-server/dist/index.js"],
+			"cwd": "/Users/neetesh.vishwakarma/Documents/postgres-mcp-server",
+      "env": {
+        "LOCAL_DB_HOST": "localhost",
+        "LOCAL_DB_PORT": "5432",
+        "LOCAL_DB_NAME": "test-mcp-db",
+        "LOCAL_DB_USER": "postgres",
+        "LOCAL_DB_PASSWORD": "postgres",
+        "QA_DB_HOST": "",
+        "QA_DB_PORT": "1526",
+        "QA_DB_NAME": "",
+        "QA_DB_USER": "",
+        "QA_DB_PASSWORD": "",
+        "QA_DB_SSL": "true",
+        "QA_DB_TIMEOUT": "10000",
+        "DEFAULT_DB": "local"
+      }
+    }
+  }
+}

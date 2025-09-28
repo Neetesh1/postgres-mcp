@@ -1,0 +1,28 @@
+{
+  "name": "postgres-mcp-server",
+  "version": "1.0.0",
+  "description": "PostgreSQL MCP server for VS Code Copilot with support for multiple database connections",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "watch": "tsx watch src/index.ts",
+    "test": "node test-direct-connection.js"
+  },
+  "keywords": ["mcp", "postgresql", "copilot", "vscode"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0",
+    "pg": "^8.12.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.4",
+    "@types/pg": "^8.11.8",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2"
+  }
+}
