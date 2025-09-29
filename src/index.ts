@@ -233,6 +233,49 @@ class PostgreSQLMCPServer {
             required: [],
           },
         },
+        {
+          name: 'query_with_where',
+          description: 'Execute a SELECT query with WHERE clause on the specified database - makes it easy to filter data',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              database: {
+                type: 'string',
+                enum: ['local', 'qa'],
+                description: 'Database to query (local or qa)',
+                default: process.env.DEFAULT_DB || 'local',
+              },
+              table_name: {
+                type: 'string',
+                description: 'Name of the table to query',
+              },
+              schema: {
+                type: 'string',
+                description: 'Schema name (default: public)',
+                default: 'public',
+              },
+              columns: {
+                type: 'string',
+                description: 'Columns to select (default: * for all columns)',
+                default: '*',
+              },
+              where_clause: {
+                type: 'string',
+                description: 'WHERE clause conditions (e.g., "age > 25 AND status = \'active\'")',
+              },
+              order_by: {
+                type: 'string',
+                description: 'ORDER BY clause (e.g., "created_at DESC")',
+              },
+              limit: {
+                type: 'number',
+                description: 'Maximum number of rows to return (default: 100)',
+                default: 100,
+              },
+            },
+            required: ['table_name', 'where_clause'],
+          },
+        },
       ];
 
       return { tools };
@@ -245,6 +288,8 @@ class PostgreSQLMCPServer {
         switch (name) {
           case 'query_database':
             return await this.handleQueryDatabase(args);
+          case 'query_with_where':
+            return await this.handleQueryWithWhere(args);
           case 'list_tables':
             return await this.handleListTables(args);
           case 'describe_table':
@@ -297,6 +342,51 @@ class PostgreSQLMCPServer {
           {
             type: 'text',
             text: `Query executed on ${database} database:\n\`\`\`sql\n${finalQuery}\n\`\`\`\n\nResults (${result.rows.length} rows):\n\`\`\`json\n${JSON.stringify(result.rows, null, 2)}\n\`\`\``,
+          },
+        ],
+      };
+    } finally {
+      await client.end();
+    }
+  }
+
+  private async handleQueryWithWhere(args: any) {
+    const database = args.database || process.env.DEFAULT_DB || 'local';
+    const tableName = args.table_name;
+    const schema = args.schema || 'public';
+    const columns = args.columns || '*';
+    const whereClause = args.where_clause;
+    const orderBy = args.order_by;
+    const limit = args.limit || 100;
+
+    // Validate table name to prevent SQL injection
+    if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(tableName)) {
+      throw new Error('Invalid table name. Only alphanumeric characters and underscores are allowed.');
+    }
+
+    if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(schema)) {
+      throw new Error('Invalid schema name. Only alphanumeric characters and underscores are allowed.');
+    }
+
+    const client = await this.connectToDatabase(database);
+    
+    try {
+      // Build the query
+      let query = `SELECT ${columns} FROM ${schema}.${tableName} WHERE ${whereClause}`;
+      
+      if (orderBy) {
+        query += ` ORDER BY ${orderBy}`;
+      }
+      
+      query += ` LIMIT ${limit}`;
+
+      const result = await client.query(query);
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Query executed on ${database} database:\n\`\`\`sql\n${query}\n\`\`\`\n\nResults (${result.rows.length} rows):\n\`\`\`json\n${JSON.stringify(result.rows, null, 2)}\n\`\`\``,
           },
         ],
       };
