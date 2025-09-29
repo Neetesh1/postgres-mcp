@@ -6,6 +6,7 @@ A Model Context Protocol (MCP) server that enables VS Code Copilot to perform re
 
 - **Multi-database support**: Connect to both local and QA PostgreSQL databases
 - **Read-only operations**: Execute SELECT queries safely
+- **Easy WHERE queries**: Simplified interface for filtering data with WHERE clauses
 - **Schema exploration**: List tables, describe table structures, and explore schemas
 - **Sample data**: Get sample rows from tables for analysis
 - **VS Code integration**: Seamless integration with GitHub Copilot in VS Code
@@ -73,20 +74,31 @@ Execute SELECT queries on your databases.
   - `query`: SQL SELECT query
   - `limit`: Maximum rows to return (default: 100)
 
-### 2. list_tables
+### 2. query_with_where
+Execute SELECT queries with WHERE clauses - makes it easy to filter data without writing full SQL.
+- **Parameters**:
+  - `table_name`: Name of the table to query
+  - `where_clause`: WHERE conditions (e.g., "age > 25 AND status = 'active'")
+  - `database` (local|qa): Target database (default: local)
+  - `schema`: Schema name (default: public)
+  - `columns`: Columns to select (default: *)
+  - `order_by`: ORDER BY clause (e.g., "created_at DESC")
+  - `limit`: Maximum rows to return (default: 100)
+
+### 3. list_tables
 List all tables in a database schema.
 - **Parameters**:
   - `database` (local|qa): Target database
   - `schema`: Schema name (default: public)
 
-### 3. describe_table
+### 4. describe_table
 Get detailed table structure information.
 - **Parameters**:
   - `database` (local|qa): Target database
   - `table_name`: Name of the table
   - `schema`: Schema name (default: public)
 
-### 4. get_table_sample
+### 5. get_table_sample
 Get sample rows from a table.
 - **Parameters**:
   - `database` (local|qa): Target database
@@ -94,7 +106,7 @@ Get sample rows from a table.
   - `schema`: Schema name (default: public)
   - `limit`: Number of rows (default: 10)
 
-### 5. list_schemas
+### 6. list_schemas
 List all schemas in the database.
 - **Parameters**:
   - `database` (local|qa): Target database
@@ -107,6 +119,10 @@ Once configured in VS Code, you can ask Copilot questions like:
 - "What's the structure of the users table in the QA database?"
 - "Get a sample of data from the orders table"
 - "Query the products table for items with price > 100"
+- "Show me all users where age > 25"
+- "Find products where price > 100 AND category = 'electronics'"
+- "Get orders where status = 'pending' ordered by created_at DESC"
+- "Show me the first 10 users where email contains '@gmail.com'"
 - "List all schemas in the QA database"
 
 ## Development
